@@ -1,0 +1,171 @@
+{
+  "products": [
+    {
+      "id": "briyani",
+      "price": 0,
+      "name": "Briyani",
+      "category": "food",
+      "categoryId": "food",
+      "date": "09/15/2023",
+      "quantity": 1,
+      "isCompleted": true,
+      "unit": "kgs"
+    },
+    {
+      "id": "cashew",
+      "price": 30,
+      "name": "Cashew",
+      "category": "Grocery",
+      "categoryId": "grocery",
+      "date": "11/16/2023",
+      "quantity": 3,
+      "isCompleted": false,
+      "unit": "kgs"
+    },
+    {
+      "id": "soap",
+      "price": 30,
+      "name": "Soap",
+      "category": "Grocery",
+      "categoryId": "grocery",
+      "date": "11/13/2023",
+      "quantity": 1,
+      "isCompleted": true,
+      "unit": "kgs"
+    },
+    {
+      "id": "banana_fruits_1701161804827",
+      "price": 0,
+      "quantity": 1,
+      "name": "Banana",
+      "categoryId": "fruits",
+      "category": "Fruits",
+      "date": "10/28/2023",
+      "isCompleted": false,
+      "unit": "kgs"
+    },
+    {
+      "id": "banana_fruits_1701167170240",
+      "price": 150,
+      "quantity": 2,
+      "name": "Banana",
+      "categoryId": "fruits",
+      "category": "Fruits",
+      "date": "11/28/2023",
+      "isCompleted": true,
+      "unit": "kgs"
+    },
+    {
+      "id": "rice_grocery_1701179511227",
+      "price": 115,
+      "quantity": 1,
+      "name": "Rice",
+      "categoryId": "grocery",
+      "category": "Grocery",
+      "date": "11/28/2023",
+      "isCompleted": true,
+      "unit": "kgs"
+    },
+    {
+      "id": "rice_oil_grocery_1701179591228",
+      "price": 0,
+      "quantity": 3,
+      "name": "Rice Oil",
+      "categoryId": "grocery",
+      "category": "Grocery",
+      "date": "11/28/2023",
+      "isCompleted": false,
+      "unit": "ltr"
+    },
+    {
+      "id": "cinthol_soap_grocery_1701189873916",
+      "price": 0,
+      "quantity": 1,
+      "name": "Cinthol Soap",
+      "categoryId": "grocery",
+      "category": "Grocery",
+      "date": "11/30/2023",
+      "isCompleted": false,
+      "unit": "kgs"
+    },
+    {
+      "id": "mustard_grocery_1701268364504",
+      "price": 0,
+      "quantity": 50,
+      "unit": "gms",
+      "name": "Mustard",
+      "categoryId": "grocery",
+      "category": "Grocery",
+      "date": "11/29/2023",
+      "isCompleted": false
+    },
+    {
+      "id": "badam_grocery_1701327223851",
+      "price": 0,
+      "quantity": 1,
+      "unit": "kgs",
+      "name": "Badam",
+      "categoryId": "grocery",
+      "category": "Grocery",
+      "date": "11/30/2023",
+      "isCompleted": false
+    },
+    {
+      "id": "rice_grocery_1701669526346",
+      "price": 0,
+      "quantity": 1,
+      "unit": "kgs",
+      "name": "Rice",
+      "categoryId": "grocery",
+      "category": "Grocery",
+      "date": "12/4/2023",
+      "isCompleted": false
+    }
+  ],
+  "availableProducts": [
+    {
+      "id": "rice_grocery",
+      "name": "Rice",
+      "categoryId": "grocery"
+    },
+    {
+      "id": "carrot_vegetables",
+      "name": "Carrot",
+      "categoryId": "vegetables"
+    },
+    {
+      "id": "cinthol_soap_grocery",
+      "name": "Cinthol Soap",
+      "categoryId": "grocery"
+    },
+    {
+      "id": "banana_fruits",
+      "name": "Banana",
+      "categoryId": "fruits"
+    },
+    {
+      "id": "mustard_grocery",
+      "name": "Mustard",
+      "categoryId": "grocery"
+    },
+    {
+      "id": "badam_grocery",
+      "name": "Badam",
+      "categoryId": "grocery"
+    }
+  ],
+  "availableCategories": [
+    {
+      "id": "grocery",
+      "name": "Grocery"
+    },
+    {
+      "id": "vegetables",
+      "name": "Vegetables"
+    },
+    {
+      "id": "fruits",
+      "name": "Fruits"
+    }
+  ]
+}

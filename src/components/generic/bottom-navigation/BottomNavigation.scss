@@ -1,0 +1,19 @@
+.bottom-navigation-wrapper {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 1;
+    // background-color: #dcede9;
+
+    background: #31604f;
+    color: white;
+    border-radius: 8px;
+
+    a {
+        color: white;
+    }
+
+    .Mui-selected {
+        color: wheat !important;
+    }
+}

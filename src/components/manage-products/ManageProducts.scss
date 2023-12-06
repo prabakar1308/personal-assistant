@@ -1,0 +1,61 @@
+.manage-products-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    // height: calc(100vh - 56px);
+    overflow-x: auto;
+    padding-bottom: 60px;
+
+    .MuiAlert-root {
+        display: flex;
+        justify-content: center;
+        width: 90%;
+        margin-top: 50%;
+    }
+    .price-field {
+        width: 80px;
+        margin: 15px 20px 10px;
+
+        .MuiInputBase-root {
+            max-height: 40px;
+        }
+    }
+
+    .item-title {
+        color: #109670;
+        background: #f7f5e1;
+        padding: 10px 0;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .MuiListItem-root {
+        // background: #b2ebe5;
+        border-radius: 10px;
+        margin: 10px 0
+    }
+
+    .complete-button  {
+        width: 96%;
+        // margin-right: 15px;
+        margin-top: 20px;
+    }
+
+    .quantity-section {
+        height: 30px;
+    .quantity-chip {
+        margin-bottom: 15px;
+        border: 2px solid;
+    }
+
+    svg {
+        cursor: pointer;
+        // pointer-events: fill;
+    }
+    }
+
+    .MuiListItemButton-root {
+        pointer-events: none;
+    }
+}
