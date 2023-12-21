@@ -1,9 +1,11 @@
 export const getCalendarDate = (value) => {
   const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() - value);
+  // currentDate.setDate(currentDate.getDate() - value);
+
+  const priorDate = new Date(new Date().setDate(currentDate.getDate() - value));
   return {
-    date: currentDate.toLocaleDateString(),
-    year: currentDate.getFullYear(),
+    date: Date.parse(priorDate),
+    year: priorDate.getFullYear(),
   };
 };
 

@@ -7,12 +7,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import Badge from "@mui/material/Badge";
 import Alert from "@mui/material/Alert";
-import Avatar from "@mui/material/Avatar";
-import Tooltip from "@mui/material/Tooltip";
-import { deepOrange } from "@mui/material/colors";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import Checkbox from "@mui/material/Checkbox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -20,6 +15,7 @@ import Fab from "@mui/material/Fab";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
 import {
   fetchProducts,
@@ -42,11 +38,11 @@ const style = {
   position: "fixed",
 };
 
-export default function ManageProducts({ isCompleted = false }) {
+export default function ManageProducts() {
   const items = useSelector((state) => state.items);
   const loading = useSelector((state) => state.loading);
-  const [checked, setChecked] = React.useState([]);
 
+  const [checked, setChecked] = useState([]);
   const [pendingList, setPendingList] = useState([]);
   const [showOverdue, setShowOverdue] = useState(0);
   const [showToday, setShowToday] = useState(0);
@@ -63,27 +59,33 @@ export default function ManageProducts({ isCompleted = false }) {
   useEffect(() => {
     const handleSorting = () => {
       const sortedData = [...items].sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
+        (a, b) => Date.parse(new Date(a.date)) - Date.parse(new Date(b.date))
       );
-      // const filteredData = isCompleted
-      //   ? sortedData.filter((a) => a.isCompleted)
-      //   : sortedData.filter((a) => !a.isCompleted);
 
       setPendingList(sortedData);
       setShowOverdue(
-        sortedData.findIndex((a) => new Date(a.date) < new Date())
+        sortedData.findIndex(
+          (a) => Date.parse(new Date(a.date)) < Date.parse(new Date())
+        )
       );
       setShowToday(
-        sortedData.findIndex((a) => a.date === new Date().toLocaleDateString())
+        sortedData.findIndex(
+          (a) =>
+            new Date(a.date).toLocaleDateString() ===
+            new Date().toLocaleDateString()
+        )
       );
       setShowUpcoming(
-        sortedData.findIndex((a) => new Date(a.date) > new Date())
+        sortedData.findIndex(
+          (a) => Date.parse(new Date(a.date)) > Date.parse(new Date())
+        )
       );
     };
     handleSorting();
   }, [items]);
 
-  const handleToggle = (product, enableCheck = true, updatePrice = 0) => {
+  const handleToggle = (id, enableCheck = true, updatePrice = 0) => {
+    const product = pendingList.filter((li) => li.id === id)[0];
     const currentIndex = checked.findIndex((item) => item.id === product.id);
     const newChecked = [...checked];
 
@@ -104,20 +106,15 @@ export default function ManageProducts({ isCompleted = false }) {
     setChecked([...newChecked]);
   };
 
-  const handleChange = (event, product) => {
-    const value = event.target.value;
+  const handleChange = (value, id) => {
     if (value && value.trim() && parseInt(value.trim())) {
-      handleToggle(product, true, parseInt(value.trim()));
+      handleToggle(id, true, parseInt(value.trim()));
     } else {
-      handleToggle(product, false);
+      handleToggle(id, false);
     }
   };
 
   const getDays = (date) => {
-    // const diffInMs = new Date(date) - new Date();
-    // console.log("diffInMs", diffInMs);
-    // return Math.round(diffInMs / (1000 * 60 * 60 * 24));
-
     if (date === new Date().toLocaleDateString()) return 0;
 
     const diffTime = new Date(date) - new Date();
@@ -125,16 +122,19 @@ export default function ManageProducts({ isCompleted = false }) {
   };
 
   const getBackgroundColor = (days) => {
-    if (days < 0 && !isCompleted)
-      return { background: "#f1c6c6", color: "error" };
-    else if (days === 0 && !isCompleted)
-      return { background: "#f2dcb0", color: "warning" };
+    if (days < 0) return { background: "#f1c6c6", color: "error" };
+    else if (days === 0) return { background: "#f2dcb0", color: "warning" };
     return { background: "#b2ebc8", color: "success" };
   };
 
   const getListItem = (details) => {
     const { id, name, category, price, unit, quantity, date, categoryId } =
       details;
+    const updatedItem = checked.filter((item) => item.id === id);
+    let updatedPrice = price;
+    if (updatedItem.length) {
+      updatedPrice = updatedItem[0].price;
+    }
     const days = getDays(date);
     return (
       <ListItem
@@ -154,37 +154,35 @@ export default function ManageProducts({ isCompleted = false }) {
               </Typography>{" "}
               {quantity > 0 && (
                 <div className="quantity-section">
-                  {!isCompleted && (
-                    <RemoveCircleOutlineIcon
-                      sx={{
-                        pointerEvents:
-                          (quantity <= 50 && unit.toLowerCase() === "gms") ||
-                          (parseInt(quantity) <= 1 &&
-                            unit.toLowerCase() !== "gms")
-                            ? "none"
-                            : "fill",
-                        opacity:
-                          (quantity <= 50 && unit.toLowerCase() === "gms") ||
-                          (parseInt(quantity) <= 1 &&
-                            unit.toLowerCase() !== "gms")
-                            ? "0.4"
-                            : "1",
-                      }}
-                      color="secondary"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        dispatch(
-                          updateProductQuantity({
-                            id,
-                            categoryId,
-                            date,
-                            canIncrease: false,
-                            number: unit.toLowerCase() === "gms" ? 50 : 1,
-                          })
-                        );
-                      }}
-                    />
-                  )}
+                  <RemoveCircleOutlineIcon
+                    sx={{
+                      pointerEvents:
+                        (quantity <= 50 && unit.toLowerCase() === "gms") ||
+                        (parseInt(quantity) <= 1 &&
+                          unit.toLowerCase() !== "gms")
+                          ? "none"
+                          : "fill",
+                      opacity:
+                        (quantity <= 50 && unit.toLowerCase() === "gms") ||
+                        (parseInt(quantity) <= 1 &&
+                          unit.toLowerCase() !== "gms")
+                          ? "0.4"
+                          : "1",
+                    }}
+                    color="secondary"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      dispatch(
+                        updateProductQuantity({
+                          id,
+                          categoryId,
+                          date,
+                          canIncrease: false,
+                          number: unit.toLowerCase() === "gms" ? 50 : 1,
+                        })
+                      );
+                    }}
+                  />
                   <Chip
                     className="quantity-chip"
                     component="span"
@@ -194,31 +192,29 @@ export default function ManageProducts({ isCompleted = false }) {
                     variant="outlined"
                     onClick={() => setShowModal(id)}
                   />
-                  {!isCompleted && (
-                    <AddCircleOutlineIcon
-                      sx={{
-                        pointerEvents: isCompleted ? "none" : "fill",
-                        opacity: isCompleted ? "0.4" : "1",
-                      }}
-                      color="secondary"
-                      onClick={() =>
-                        dispatch(
-                          updateProductQuantity({
-                            id,
-                            categoryId,
-                            date,
-                            canIncrease: true,
-                            number: unit.toLowerCase() === "gms" ? 50 : 1,
-                          })
-                        )
-                      }
-                    />
-                  )}
+                  <AddCircleOutlineIcon
+                    sx={{
+                      pointerEvents: "fill",
+                      opacity: "1",
+                    }}
+                    color="secondary"
+                    onClick={() =>
+                      dispatch(
+                        updateProductQuantity({
+                          id,
+                          categoryId,
+                          date,
+                          canIncrease: true,
+                          number: unit.toLowerCase() === "gms" ? 50 : 1,
+                        })
+                      )
+                    }
+                  />
                   {(unit === "kgs" || unit === "ltr") && (
                     <MapsUgcIcon
                       sx={{
-                        pointerEvents: isCompleted ? "none" : "fill",
-                        opacity: isCompleted ? "0.4" : "1",
+                        pointerEvents: "fill",
+                        opacity: "1",
                         color: "#2f6988",
                       }}
                       onClick={() =>
@@ -233,6 +229,17 @@ export default function ManageProducts({ isCompleted = false }) {
                     color="error"
                     sx={{ color: "#822720" }}
                     onClick={() => setShowConfirmModal(id)}
+                  />
+                  <CurrencyRupeeIcon
+                    color="primary"
+                    sx={{ color: "#822720" }}
+                    onClick={() =>
+                      setShowModal({
+                        title: "Price",
+                        id,
+                        isPrice: true,
+                      })
+                    }
                   />
                 </div>
               )}
@@ -263,32 +270,15 @@ export default function ManageProducts({ isCompleted = false }) {
           }
         />
         <ListItemIcon>
-          {isCompleted ? (
-            <>
-              <Badge
-                sx={{ margin: "12px 30px 0 0" }}
-                badgeContent={price}
-                color="success"
-              >
-                <CurrencyRupeeIcon />
-              </Badge>
-              <Tooltip title={price}>
-                <Avatar sx={{ marginRight: "30px", bgcolor: deepOrange[500] }}>
-                  {quantity * price}
-                </Avatar>
-              </Tooltip>
-            </>
-          ) : (
-            <TextField
-              type="number"
-              className="price-field"
-              id="standard-basic"
-              label="Price"
-              variant="outlined"
-              defaultValue={price}
-              onChange={(event) => handleChange(event, details)}
-            />
-          )}
+          <TextField
+            type="number"
+            className="price-field"
+            id="standard-basic"
+            label="Price"
+            variant="outlined"
+            value={updatedPrice}
+            onChange={(event) => handleChange(event.target.value, details.id)}
+          />
 
           <Checkbox
             edge="start"
@@ -297,7 +287,7 @@ export default function ManageProducts({ isCompleted = false }) {
             disableRipple
             onChange={() =>
               handleToggle(
-                details,
+                details.id,
                 checked.filter((pro) => pro.id === id).length === 0
               )
             }
@@ -308,11 +298,9 @@ export default function ManageProducts({ isCompleted = false }) {
     );
   };
 
-  const onFilterProducts = (filter) => {};
-
   const onButtonClick = () => {
     console.log(checked);
-    dispatch(updateProducts({ items: checked, isCompleted }));
+    dispatch(updateProducts({ items: checked, isCompleted: false }));
     setChecked([]);
   };
 
@@ -320,9 +308,6 @@ export default function ManageProducts({ isCompleted = false }) {
     <div className="manage-products-wrapper">
       {pendingList.length > 0 && !loading ? (
         <>
-          {isCompleted && (
-            <FilterProducts onFilter={(filter) => onFilterProducts(filter)} />
-          )}
           <List
             sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
           >
@@ -331,7 +316,7 @@ export default function ManageProducts({ isCompleted = false }) {
               return (
                 <>
                   {/* {showOverdueText && <Divider />} */}
-                  {showOverdue === index && !isCompleted && (
+                  {showOverdue === index && (
                     <Typography
                       key={`item-t1-${index}`}
                       variant="subtitle2"
@@ -342,7 +327,7 @@ export default function ManageProducts({ isCompleted = false }) {
                       OVERDUES (LAST 30 DAYS)
                     </Typography>
                   )}
-                  {showToday === index && !isCompleted && (
+                  {showToday === index && (
                     <Typography
                       key={`item-t2-${index}`}
                       variant="subtitle2"
@@ -353,7 +338,7 @@ export default function ManageProducts({ isCompleted = false }) {
                       TODAY
                     </Typography>
                   )}
-                  {showUpcoming === index && !isCompleted && (
+                  {showUpcoming === index && (
                     <Typography
                       key={`item-t3-${index}`}
                       variant="subtitle2"
@@ -364,7 +349,7 @@ export default function ManageProducts({ isCompleted = false }) {
                       UPCOMING
                     </Typography>
                   )}
-
+                  {/* <p>{list.name}</p> */}
                   {getListItem({ ...list })}
                 </>
               );
@@ -390,9 +375,9 @@ export default function ManageProducts({ isCompleted = false }) {
       )}
       <UpdateModal
         open={showModal}
-        onClose={({ id, value, canIncrease = false }) => {
+        onClose={({ id, value, canIncrease = false, isPrice }) => {
           setShowModal(null);
-          if (value) {
+          if (value && !isPrice) {
             dispatch(
               updateProductQuantity({
                 id,
@@ -400,6 +385,8 @@ export default function ManageProducts({ isCompleted = false }) {
                 number: value,
               })
             );
+          } else if (value !== null) {
+            handleChange(value.toString(), id);
           }
         }}
       />

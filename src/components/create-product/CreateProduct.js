@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-
-import MuiAlert from "@mui/material/Alert";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Divider from "@mui/material/Divider";
@@ -18,6 +16,7 @@ import Chip from "@mui/material/Chip";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
+import BackdropLoader from "../generic/backdrop-loader/BackdropLoader";
 import {
   resetCreateProductMessage,
   fetchAvailableProducts,
@@ -25,16 +24,13 @@ import {
   createAvailableCategories,
   createProducts,
   fetchAvailableCategories,
+  fetchProducts,
 } from "../../store/reducer";
 import InfoMessage from "../generic/info-message/InfoMessage";
 import RadioGroup from "../generic/radio-group/RadioGroup";
 import UploadExcelData from "./upload-excel-data/UploadExcelData";
 import AutoCompleteMic from "./autocomplete-mic/AutoCompleteMic";
 import "./CreateProduct.scss";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 const radioInputs = [
   { label: "Kgs", value: "kgs" },
@@ -48,12 +44,12 @@ const theme = "secondary";
 export default function CreateProduct() {
   const availableProducts = useSelector((state) => state.availableProducts);
   const availableCategories = useSelector((state) => state.availableCategories);
+  const loading = useSelector((state) => state.loading);
+  const products = useSelector((state) => state.items);
   const createProductMessage = useSelector(
     (state) => state.createProductMessage
   );
   const dispatch = useDispatch();
-  // const [productOpen, setProductOpen] = useState(false);
-  // const [productInput, setProductInput] = useState("");
   const [showError, setShowError] = useState(false);
   const [formData, setFormData] = useState({
     product: null,
@@ -67,31 +63,13 @@ export default function CreateProduct() {
   const [showUpload, setShowUpload] = useState(false);
   const [currentMic, setCurrentMic] = useState("");
 
-  // const {
-  //   transcript,
-  //   listening,
-  //   resetTranscript,
-  //   browserSupportsSpeechRecognition,
-  // } = useSpeechRecognition();
-
-  // const startListening = (e) => {
-  //   SpeechRecognition.startListening({ continuous: true });
-  // };
-
   useEffect(() => {
     dispatch(fetchAvailableProducts());
     dispatch(fetchAvailableCategories());
 
-    // axios.get(
-    //   "https://my-deployment-88217c.es.us-central1.gcp.cloud.es.io/_search",
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization:
-    //         "ApiKey essu_WjFwRU9VOUpkMEpUVFRodmNtOVRORzlLTnpnNlgxWnlkVmRDT1ZOUldFOUlSVTF1VlRNd1pESmtVUT09AAAAAKXce4g=",
-    //     },
-    //   }
-    // );
+    if (products.length === 0) {
+      dispatch(fetchProducts());
+    }
   }, []);
 
   useEffect(() => {
@@ -111,10 +89,6 @@ export default function CreateProduct() {
     } else if (field === "quantity" && value) {
       updatedValue = parseInt(value, 10);
     }
-    // else if (field === "product" || field === "category") {
-    //   updatedValue = { ...value };
-    //   // delete updatedValue.label;
-    // }
 
     let filteredCategory = null;
     const isOldProduct = !!(updatedValue && updatedValue.categoryId);
@@ -174,11 +148,6 @@ export default function CreateProduct() {
         );
       }
 
-      // let updatedQuantity = quantity;
-      // if (unit.toLowerCase() === "gms"){
-      //   updatedQuantity = parseFloat(quantity/1000)
-      // }
-
       dispatch(
         createProducts({
           id: `${productId}_${new Date().getTime()}`,
@@ -189,6 +158,7 @@ export default function CreateProduct() {
           categoryId,
           category: category.name,
           date: new Date(dueDate).toLocaleDateString(),
+          purchasedDate: 0,
           isCompleted: false,
         })
       );
@@ -234,158 +204,7 @@ export default function CreateProduct() {
           !formData.product || (formData.product && !!formData.product.id)
         }
       />
-      {/* <Stack direction="row">
-        <Autocomplete
-          open={productOpen}
-          onOpen={() => setProductOpen(true)}
-          onClose={() => setProductOpen(false)}
-          id="product"
-          options={availableProducts.map((al) => ({ ...al, label: al.name }))}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          renderInput={(params) => {
-            return (
-              <TextField
-                {...params}
-                label="Products"
-                error={showError && !formData.product}
-                helperText={
-                  showError && !formData.product ? "Invalid Value!" : ""
-                }
-              />
-            );
-          }}
-          // onChange={(event, value) => onItemSelectionChange(value, "product")}
-          onChange={(event, newValue) => {
-            if (typeof newValue === "string") {
-              onItemSelectionChange(newValue, "product");
-              // setValue({
-              //   label: newValue,
-              // });
-            } else if (newValue && newValue.inputValue) {
-              // Create a new value from the user input
-              // setValue({
-              //   label: newValue.inputValue,
-              // });
-              const { inputValue } = newValue;
-              onItemSelectionChange(
-                { name: inputValue, label: inputValue },
-                "product"
-              );
-            } else {
-              onItemSelectionChange(newValue, "product");
-              // setValue(newValue);
-            }
-          }}
-          value={formData.product}
-          inputValue={productInput}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
 
-            const { inputValue } = params;
-            // Suggest the creation of a new value
-            const isExisting = options.some(
-              (option) => inputValue === option.label
-            );
-            if (inputValue !== "" && !isExisting) {
-              filtered.push({
-                inputValue,
-                label: `Add "${inputValue}"`,
-              });
-            }
-
-            return filtered;
-          }}
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-        />
-        <IconButton
-          className="mic-icon-button"
-          onTouchStart={(e) => {
-            startListening(e);
-            document.getElementById("product").focus();
-            setProductOpen(true);
-          }}
-          // onMouseDown={startListening}
-          // onMouseUp={SpeechRecognition.stopListening}
-          onTouchEnd={(e) => {
-            SpeechRecognition.stopListening();
-            console.log("Sddsdsddsd");
-            resetTranscript();
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          // onMouseUp={SpeechRecognition.stopListening}
-          sx={{
-            background: listening ? "red" : "#9f2c5e",
-            m: "20px -5px 20px 3px",
-            color: "white",
-          }}
-        >
-          <MicIcon />
-        </IconButton>
-      </Stack> */}
-
-      {/* <Autocomplete
-        disablePortal
-        id="category"
-        value={formData.category}
-        options={availableCategories.map((al) => ({ ...al, label: al.name }))}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Category"
-            error={showError && !formData.category}
-            helperText={showError && !formData.category ? "Invalid Value!" : ""}
-          />
-        )}
-        // onChange={(event, value) => onItemSelectionChange(value, "category")}
-        onChange={(event, newValue) => {
-          if (typeof newValue === "string") {
-            onItemSelectionChange(newValue, "category");
-            // setValue({
-            //   label: newValue,
-            // });
-          } else if (newValue && newValue.inputValue) {
-            // Create a new value from the user input
-            // setValue({
-            //   label: newValue.inputValue,
-            // });
-            const { inputValue } = newValue;
-            onItemSelectionChange(
-              { name: inputValue, label: inputValue },
-              "category"
-            );
-          } else {
-            onItemSelectionChange(newValue, "category");
-            // setValue(newValue);
-          }
-        }}
-        disabled={
-          !formData.product || (formData.product && !!formData.product.id)
-        }
-        filterOptions={(options, params) => {
-          const filtered = filter(options, params);
-
-          const { inputValue } = params;
-          // Suggest the creation of a new value
-          const isExisting = options.some(
-            (option) => inputValue === option.label
-          );
-          if (inputValue !== "" && !isExisting) {
-            filtered.push({
-              inputValue,
-              label: `Add "${inputValue}"`,
-            });
-          }
-
-          return filtered;
-        }}
-        selectOnFocus
-        clearOnBlur
-        handleHomeEndKeys
-      /> */}
       <RadioGroup
         title={"Units"}
         value={"kgs"}
@@ -485,10 +304,6 @@ export default function CreateProduct() {
           onItemSelectionChange(event.target.value, "quantity")
         }
       />
-      {/* <DatePicker
-        selected={startDate}
-        onChange={(date) => setStartDate(date)}
-      /> */}
       <Button
         className="create-button"
         variant="contained"
@@ -510,6 +325,8 @@ export default function CreateProduct() {
         />
       )}
       {showUpload && <UploadExcelData onClose={() => {}} />}
+
+      <BackdropLoader open={loading} />
     </div>
   );
 }

@@ -1,6 +1,14 @@
 .radio-group-wrapper {
-    .MuiFormLabel-root {
-        text-align: left;
-        padding-left: 3px;
+  .MuiFormLabel-root {
+    text-align: left;
+    padding-left: 3px;
+  }
+
+  .MuiFormControlLabel-root {
+    // margin: 0;
+
+    .MuiRadio-root {
+      padding-right: 3px;
     }
+  }
 }

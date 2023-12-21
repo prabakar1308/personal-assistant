@@ -1,19 +1,24 @@
 import React, { useState } from "react";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
+import Slider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 export default function UpdateModal({ open, onClose }) {
-  const { title, id } = open || {};
+  const { title, id, isPrice = false } = open || {};
   const [selectedValue, setSelectedValue] = useState(0);
+  const [thousand, setThousand] = useState(0);
+  const [hundred, setHundred] = useState(0);
+  const [ten, setTen] = useState(0);
   const handleClose = (value, canIncrease) => {
-    onClose({ value, id, canIncrease });
+    onClose({ value, id, canIncrease, isPrice });
   };
 
   const list = [
@@ -39,15 +44,73 @@ export default function UpdateModal({ open, onClose }) {
             useFlexGap
             flexWrap="wrap"
           >
-            {list.map(({ label, value }) => (
-              <Chip
-                sx={{ width: "50px", fontWeight: "bold" }}
-                label={label}
-                onClick={() => setSelectedValue(value)}
-                color={selectedValue === value ? "success" : "default"}
-                variant={"contained"}
-              />
-            ))}
+            {!isPrice ? (
+              list.map(({ label, value }) => (
+                <Chip
+                  sx={{ width: "50px", fontWeight: "bold" }}
+                  label={label}
+                  onClick={() => setSelectedValue(value)}
+                  color={selectedValue === value ? "success" : "default"}
+                  variant={"contained"}
+                />
+              ))
+            ) : (
+              <>
+                <Typography variant="subtitle2" gutterBottom>
+                  Thousands (0 - 100)
+                </Typography>
+                <Slider
+                  onChange={(event) => setThousand(event.target.value)}
+                  value={thousand}
+                  valueLabelDisplay="auto"
+                  aria-label="Default"
+                  sx={{ color: "#9f2c5e" }}
+                />
+                <Typography variant="subtitle2" gutterBottom>
+                  Hundreds (0 - 10)
+                </Typography>
+                <Slider
+                  onChange={(event) => setHundred(event.target.value)}
+                  value={hundred}
+                  aria-label="Default"
+                  valueLabelDisplay="auto"
+                  max={10}
+                  sx={{ color: "#9f2c5e" }}
+                />
+                <Typography variant="subtitle2" gutterBottom>
+                  Tens (0 - 100)
+                </Typography>
+                <Slider
+                  onChange={(event) => setTen(event.target.value)}
+                  value={ten}
+                  aria-label="Default"
+                  valueLabelDisplay="auto"
+                  sx={{ color: "#9f2c5e" }}
+                />
+                <Stack direction="row" spacing={1}>
+                  <Chip
+                    icon={<CurrencyRupeeIcon />}
+                    sx={{ fontWeight: "bold" }}
+                    color="success"
+                    label={thousand * 1000}
+                  />
+                  <AddCircleIcon color="success" />
+                  <Chip
+                    icon={<CurrencyRupeeIcon />}
+                    sx={{ fontWeight: "bold" }}
+                    color="success"
+                    label={hundred * 100}
+                  />
+                  <AddCircleIcon color="success" />
+                  <Chip
+                    icon={<CurrencyRupeeIcon />}
+                    sx={{ fontWeight: "bold" }}
+                    color="success"
+                    label={ten}
+                  />
+                </Stack>
+              </>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", padding: "20px" }}>
@@ -58,21 +121,35 @@ export default function UpdateModal({ open, onClose }) {
           >
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => handleClose(selectedValue, false)}
-          >
-            Remove
-          </Button>
-          <Button
-            disabled={!selectedValue}
-            variant="contained"
-            color="success"
-            onClick={() => handleClose(selectedValue, true)}
-          >
-            Add
-          </Button>
+          {!isPrice ? (
+            <>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => handleClose(selectedValue, false)}
+              >
+                Remove
+              </Button>
+              <Button
+                disabled={!selectedValue}
+                variant="contained"
+                color="success"
+                onClick={() => handleClose(selectedValue, true)}
+              >
+                Add
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() =>
+                handleClose(thousand * 1000 + hundred * 100 + ten, true)
+              }
+            >
+              Update Price ({thousand * 1000 + hundred * 100 + ten})
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </React.Fragment>

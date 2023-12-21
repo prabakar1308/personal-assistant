@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from "react";
-import TextField from "@mui/material/TextField";
-import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
-import Stack from "@mui/material/Stack";
-
-import MuiAlert from "@mui/material/Alert";
-import MicIcon from "@mui/icons-material/Mic";
-import IconButton from "@mui/material/IconButton";
-
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import TextField from "@mui/material/TextField";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import Stack from "@mui/material/Stack";
+import MicIcon from "@mui/icons-material/Mic";
+import IconButton from "@mui/material/IconButton";
 
 import InfoMessage from "../../generic/info-message/InfoMessage";
 import { capitalizeFirstLetter } from "../../../utils";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 export default function AutoCompleteMic({
   list,
@@ -32,9 +25,7 @@ export default function AutoCompleteMic({
   const filter = createFilterOptions();
   const [inputOpen, setInputOpen] = useState(false);
   const [textValue, setTextValue] = useState("");
-
   const [selectedValue, setSelectedValue] = useState(data);
-
   const [showMicError, setShowMicError] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
@@ -57,9 +48,9 @@ export default function AutoCompleteMic({
 
   useEffect(() => {
     if (currentMicId === id && transcript) {
-      console.log(transcript);
       const value = capitalizeFirstLetter(transcript);
       setTextValue(value);
+      setInputOpen(true);
     }
   }, [transcript]);
 
@@ -139,7 +130,6 @@ export default function AutoCompleteMic({
         clearOnBlur
         handleHomeEndKeys
       />
-      {/* <UploadFileIcon onClick={() => setShowUpload(true)} /> */}
       <IconButton
         id={`icon-btn-${id}`}
         className="mic-icon-button"
@@ -148,7 +138,7 @@ export default function AutoCompleteMic({
           resetTranscript();
           startListening(e);
           document.getElementById(id).focus();
-          setInputOpen(true);
+          // setInputOpen(true);
           setIsMicOn(true);
           onMic(id);
         }}

@@ -1,38 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { formatDistance } from "date-fns";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Badge from "@mui/material/Badge";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import Checkbox from "@mui/material/Checkbox";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import Fab from "@mui/material/Fab";
-import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
 import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
-import { useDispatch, useSelector } from "react-redux";
+import { deepOrange, deepPurple } from "@mui/material/colors";
 
 import "./CompletedProducts.scss";
-import {
-  // updateItems,
-  // updateQuantity,
-  fetchProducts,
-  updateProducts,
-  updateProductQuantity,
-} from "../../store/reducer";
+import { fetchProducts, updateProducts } from "../../store/reducer";
 import UpdateModal from "../generic/update-modal/UpdateModal";
 import FilterProducts from "../filter-products/FilterProducts";
-import { getCalendarDate } from "../../utils";
 import BackdropLoader from "../generic/backdrop-loader/BackdropLoader";
-import { deepOrange, deepPurple } from "@mui/material/colors";
 import CategoryWiseModal from "../category-wise/CategoryWiseModal";
 
 const style = {
@@ -70,10 +59,11 @@ export default function CompletedProducts({ isCompleted = true }) {
     const year = new Date().getFullYear();
 
     const sortedData = [...items].sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
+      (a, b) => new Date(b.purchasedDate) - new Date(a.purchasedDate)
     );
     const filteredData = sortedData.filter(
-      (a) => a.isCompleted && new Date(a.date) >= new Date(year, month, 1)
+      (a) =>
+        a.isCompleted && new Date(a.purchasedDate) >= new Date(year, month, 1)
     );
     setPendingList(filteredData);
     setCompletedList(sortedData);
@@ -110,10 +100,6 @@ export default function CompletedProducts({ isCompleted = true }) {
   };
 
   const getDays = (date) => {
-    // const diffInMs = new Date(date) - new Date();
-    // console.log("diffInMs", diffInMs);
-    // return Math.round(diffInMs / (1000 * 60 * 60 * 24));
-
     if (date === new Date().toLocaleDateString()) return 0;
 
     const diffTime = new Date(date) - new Date();
@@ -129,20 +115,14 @@ export default function CompletedProducts({ isCompleted = true }) {
   };
 
   const getListItem = (details) => {
-    const { id, name, category, unit, price, quantity, date, categoryId } =
+    const { id, name, category, unit, price, quantity, date, purchasedDate } =
       details;
-    const days = getDays(date);
+    const days = getDays(purchasedDate);
     return (
       <ListItem
         key={`item-${id}`}
         sx={{ background: getBackgroundColor(days).background }}
       >
-        {/* <ListItemButton key={`item-button-${id}`} role={undefined}> */}
-        {/* <ListItemAvatar>
-          <Avatar>
-            <ImageIcon />
-          </Avatar>
-        </ListItemAvatar> */}
         <ListItemText
           primary={
             <>
@@ -165,13 +145,6 @@ export default function CompletedProducts({ isCompleted = true }) {
                     variant="outlined"
                     onClick={() => setShowModal(id)}
                   />
-                  {/* <Badge
-                    sx={{ margin: "12px 30px 0 0" }}
-                    badgeContent={price}
-                    color="success"
-                  >
-                    <CurrencyRupeeIcon />
-                  </Badge> */}
                   <Avatar
                     sx={{
                       width: "auto",
@@ -191,14 +164,6 @@ export default function CompletedProducts({ isCompleted = true }) {
           }
           secondary={
             <>
-              {/* <Typography
-                sx={{ display: "inline" }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                {category}
-              </Typography> */}
               <Chip
                 component="span"
                 label={unit}
@@ -212,29 +177,21 @@ export default function CompletedProducts({ isCompleted = true }) {
                 size="small"
                 color="warning"
               />{" "}
-              <Chip
-                component="span"
-                label={`${days === 0 ? "Today" : `${Math.abs(days)} days`}`}
-                size="small"
-                color={getBackgroundColor(days).color}
-              />
+              <Tooltip title={new Date(date).toDateString()}>
+                <Chip
+                  component="span"
+                  // label={`${days === 0 ? "Today" : `${Math.abs(days)} days`}`}
+                  label={formatDistance(new Date(), new Date(date))}
+                  size="small"
+                  color={getBackgroundColor(days).color}
+                />
+              </Tooltip>
             </>
           }
         />
-        {/* <ListItemText>
-        </ListItemText> */}
         <ListItemIcon>
           {isCompleted ? (
-            // <ListItemAvatar>30</ListItemAvatar>
             <>
-              {/* <Badge
-                sx={{ margin: "12px 30px 0 0" }}
-                badgeContent={price}
-                color="success"
-                max={999}
-              >
-                <CurrencyRupeeIcon />
-              </Badge> */}
               <Tooltip title={price}>
                 <Avatar
                   sx={{
@@ -273,8 +230,6 @@ export default function CompletedProducts({ isCompleted = true }) {
             inputProps={{ "aria-labelledby": `${name}-${id}` }}
           />
         </ListItemIcon>
-        {/* <ListItemText id={labelId} primary={`Line item ${value + 1}`} /> */}
-        {/* </ListItemButton> */}
       </ListItem>
     );
   };
@@ -282,20 +237,20 @@ export default function CompletedProducts({ isCompleted = true }) {
   const onFilterProducts = ({ date, text, label }) => {
     setFilterLabel(label);
     const sortedData = [...items].sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
+      (a, b) => new Date(b.purchasedDate) - new Date(a.purchasedDate)
     );
     const isYear = !isNaN(date);
 
     const filteredData = sortedData.filter((a) => {
-      let dateFilter = new Date(a.date) >= new Date(date);
+      let dateFilter = new Date(a.purchasedDate) >= new Date(date);
       if (isYear) {
         dateFilter =
-          new Date(a.date) >= new Date(date, 0, 1) &&
-          new Date(a.date) <= new Date(date, 11, 31);
+          new Date(a.purchasedDate) >= new Date(date, 0, 1) &&
+          new Date(a.purchasedDate) <= new Date(date, 11, 31);
       } else if (date === "month") {
         const month = new Date().getMonth();
         const year = new Date().getFullYear();
-        dateFilter = new Date(a.date) >= new Date(year, month, 1);
+        dateFilter = new Date(a.purchasedDate) >= new Date(year, month, 1);
       } else if (date === "last_month") {
         const currentDate = new Date();
         const monthIndex = new Date(
@@ -303,8 +258,8 @@ export default function CompletedProducts({ isCompleted = true }) {
         ).getMonth();
         const year = currentDate.getFullYear();
         dateFilter =
-          new Date(a.date) >= new Date(year, monthIndex, 1) &&
-          new Date(a.date) <= new Date(year, monthIndex, 31);
+          new Date(a.purchasedDate) >= new Date(year, monthIndex, 1) &&
+          new Date(a.purchasedDate) <= new Date(year, monthIndex, 31);
       }
       if (text && date) {
         return a.isCompleted && a.name.includes(text) && dateFilter;
@@ -344,38 +299,10 @@ export default function CompletedProducts({ isCompleted = true }) {
             sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
           >
             {pendingList.map((list, index) => {
-              const days = getDays(list.date);
+              const days = getDays(list.purchasedDate);
               return <>{getListItem({ ...list })}</>;
             })}
-            {/* <ListItem>
-        {getListItem({ price: 30, name: "briyani", category: "food" })}
-      </ListItem>
-      <ListItem></ListItem>
-      <ListItem>
-        <ListItemAvatar>
-          <Avatar>
-            <WorkIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Work" secondary="Jan 7, 2014" />
-      </ListItem>
-      <ListItem>
-        <ListItemAvatar>
-          <Avatar>
-            <BeachAccessIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Vacation" secondary="July 20, 2014" />
-      </ListItem> */}
           </List>
-          {/* <Button
-            className="complete-button"
-            variant="contained"
-            disabled={checked.length === 0}
-            onClick={() => onButtonClick()}
-          >
-            {isCompleted ? "Move Back" : "Complete"}
-          </Button> */}
 
           <Fab
             style={style}

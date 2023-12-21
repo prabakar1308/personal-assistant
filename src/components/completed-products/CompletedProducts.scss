@@ -1,67 +1,70 @@
 .completed-products-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  // height: calc(100vh - 56px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 100px;
+  padding-top: 10px;
+
+  .filter-section {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .MuiAlert-root {
     display: flex;
     justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    // height: calc(100vh - 56px);
-    overflow-x: auto;
-    padding-bottom: 60px;
-    padding-top: 10px;
+    width: 90%;
+    margin-top: 50%;
+  }
+  .price-field {
+    width: 70px;
+    margin: 15px 20px 10px 10px;
 
-    .filter-section {
-        display: flex;
-        flex-direction: row;
+    .MuiInputBase-root {
+      max-height: 40px;
     }
 
-    .MuiAlert-root {
-        display: flex;
-        justify-content: center;
-        width: 90%;
-        margin-top: 50%;
+    .MuiInputLabel-root {
     }
-    .price-field {
-        width: 80px;
-        margin: 15px 20px 10px;
+  }
 
-        .MuiInputBase-root {
-            max-height: 40px;
-        }
+  .item-title {
+    color: #109670;
+  }
 
-        .MuiInputLabel-root {}
-    }
+  .MuiListItem-root {
+    // background: #b2ebe5;
+    border-radius: 10px;
+    margin: 10px 5px;
+    width: 97%;
+  }
 
-    .item-title {
-        color: #109670;
-    }
+  .complete-button {
+    width: 96%;
+    // margin-right: 15px;
+    margin-top: 20px;
+  }
 
-    .MuiListItem-root {
-        // background: #b2ebe5;
-        border-radius: 10px;
-        margin: 10px 0
-    }
-
-    .complete-button  {
-        width: 96%;
-        // margin-right: 15px;
-        margin-top: 20px;
-    }
-
-    .quantity-section {
-        height: 30px;
-        display: flex;
-        flex-direction: row;
+  .quantity-section {
+    height: 30px;
+    display: flex;
+    flex-direction: row;
     .quantity-chip {
-        margin-bottom: 15px;
-        border: 2px solid;
+      margin-bottom: 15px;
+      border: 2px solid;
     }
 
     svg {
-        cursor: pointer;
-        // pointer-events: fill;
+      cursor: pointer;
+      // pointer-events: fill;
     }
-    }
+  }
 
-    .MuiListItemButton-root {
-        pointer-events: none;
-    }
+  .MuiListItemButton-root {
+    pointer-events: none;
+  }
 }

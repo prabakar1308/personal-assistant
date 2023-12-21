@@ -27,13 +27,6 @@ export default function FilterProducts({ onFilter }) {
   const [dateFilter, setDateFilter] = React.useState(dateFilters[0].value);
   const [searchText, setSearchText] = React.useState("");
 
-  // useEffect(() => {
-  //   onFilter({
-  //     date: getCalendarDate(30).date,
-  //     text: "",
-  //   });
-  // }, []);
-
   const getFilterLabel = (val) => {
     const filteredData = dateFilters.filter((df) => df.value === val);
     if (filteredData.length > 0) return filteredData[0].label;
@@ -55,6 +48,9 @@ export default function FilterProducts({ onFilter }) {
     <Box
       sx={{
         "& > :not(style)": { m: 1, width: "18ch" },
+        paddingLeft: "5%",
+        display: "flex",
+        width: "82%",
       }}
       noValidate
       autoComplete="off"
@@ -73,8 +69,6 @@ export default function FilterProducts({ onFilter }) {
           });
         }}
       />
-      {/* <TextField id="filled-basic" label="Filled" variant="filled" />
-      <TextField id="standard-basic" label="Standard" variant="standard" /> */}
 
       <FormControl>
         <InputLabel id="demo-simple-select-label">Filter</InputLabel>
@@ -85,16 +79,9 @@ export default function FilterProducts({ onFilter }) {
           label="Filter"
           onChange={handleChange}
         >
-          {/* <MenuItem value={getDate(30).date}>Last 30 days</MenuItem> */}
-          {/* <MenuItem value={getDate(90).date}>Last 90 days</MenuItem> */}
           {dateFilters.map(({ value, label }) => (
             <MenuItem value={value}>{label}</MenuItem>
           ))}
-          {/* <MenuItem value={"month"}>This Month</MenuItem>
-          <MenuItem value={"last_month"}>Last Month</MenuItem>
-          <MenuItem value={getDate(90).date}>Last 90 Days</MenuItem>
-          <MenuItem value={getDate(0).year}>This Year</MenuItem>
-          <MenuItem value={getDate(0).year - 1}>{getDate(0).year - 1}</MenuItem> */}
         </Select>
       </FormControl>
     </Box>
